@@ -34,6 +34,8 @@
 #define CREATE_TRACE_POINTS
 #include <trace/events/cpufreq_interactive.h>
 
+static bool pegasusq_is_activef = false;
+
 static atomic_t active_count = ATOMIC_INIT(0);
 
 struct cpufreq_interactive_cpuinfo {
