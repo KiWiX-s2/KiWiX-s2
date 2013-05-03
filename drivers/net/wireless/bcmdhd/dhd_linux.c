@@ -407,6 +407,14 @@ uint dhd_console_ms = 0;
 module_param(dhd_console_ms, uint, 0644);
 #endif /* defined(DHD_DEBUG) */
 
+/* Control wifi power mode during sleep
+ * /sys/module/bcmdhd/wifi_pm
+ */
+#if defined(CONFIG_HAS_EARLYSUSPEND)
+uint wifi_pm = 0;
+module_param(wifi_pm, uint, 0644);
+#endif /* defined(CONFIG_HAS_EARLYSUSPEND) */
+
 uint dhd_slpauto = TRUE;
 module_param(dhd_slpauto, uint, 0);
 
@@ -497,8 +505,6 @@ module_param(dhd_deferred_tx, uint, 0);
 extern void dhd_dbg_init(dhd_pub_t *dhdp);
 extern void dhd_dbg_remove(void);
 #endif /* BCMDBGFS */
-
-
 
 #ifdef SDTEST
 /* Echo packet generator (pkts/s) */
@@ -640,14 +646,11 @@ void dhd_enable_packet_filter(int value, dhd_pub_t *dhd)
 }
 #endif /* PKT_FILTER_SUPPORT */
 
-#ifdef CONFIG_BCMDHD_WIFI_PM
-static int wifi_pm = 0;
-
-module_param(wifi_pm, int, 0755);
-#endif
-
 static int dhd_set_suspend(int value, dhd_pub_t *dhd)
 {
+	int power_mode = PM_MAX;
+	if (wifi_pm == 1)
+	     power_mode = PM_FAST;
 #ifndef SUPPORT_PM2_ONLY
 	int power_mode = PM_MAX;
 #endif
@@ -670,11 +673,6 @@ static int dhd_set_suspend(int value, dhd_pub_t *dhd)
 		__FUNCTION__, value, dhd->in_suspend));
 
 	dhd_suspend_lock(dhd);
-
-#ifdef CONFIG_BCMDHD_WIFI_PM
-	if (wifi_pm == 1)
-	    power_mode = PM_FAST;
-#endif
 
 	if (dhd && dhd->up) {
 		if (value && dhd->in_suspend) {
