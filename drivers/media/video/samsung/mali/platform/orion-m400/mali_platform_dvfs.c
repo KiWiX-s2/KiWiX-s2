@@ -116,7 +116,7 @@ mali_dvfs_threshold_table mali_dvfs_threshold[MALI_DVFS_STEPS]={
 #define ASV_5_LEVEL	5
 
 static unsigned int asv_3d_volt_5_table[ASV_5_LEVEL][MALI_DVFS_STEPS] = {
-	/* L4(100MHz), L3(160MHz), L2(267MHz), L1(330MHz) */
+	/* L4(108MHz), L3(160MHz), L2(267MHz), L1(330MHz) */
 	{ 950000, 1000000, 1100000, 1150000},  /* S */
 	{ 950000, 1000000, 1100000, 1150000},  /* A */
 	{ 900000,  950000, 1000000, 1100000},  /* B */
@@ -125,7 +125,7 @@ static unsigned int asv_3d_volt_5_table[ASV_5_LEVEL][MALI_DVFS_STEPS] = {
 };
 
 static unsigned int asv_3d_volt_8_table[ASV_8_LEVEL][MALI_DVFS_STEPS] = {
-	/* L4(100MHz), L3(160MHz), L2(267MHz)), L1(330MHz) */
+	/* L4(108MHz), L3(160MHz), L2(267MHz)), L1(330MHz) */
 	{ 950000, 1000000, 1100000, 1150000},  /* SS */
 	{ 950000, 1000000, 1100000, 1150000},  /* A1 */
 	{ 950000, 1000000, 1100000, 1150000},  /* A2 */
