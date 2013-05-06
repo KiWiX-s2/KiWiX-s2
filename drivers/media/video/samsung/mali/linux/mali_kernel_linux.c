@@ -75,6 +75,10 @@ module_param(mali_boot_profiling, int, S_IRUSR | S_IRGRP | S_IROTH);
 MODULE_PARM_DESC(mali_boot_profiling, "Start profiling as a part of Mali driver initialization");
 #endif
 
+/* Export symbols from common code: mali_user_settings.c */
+#include "mali_user_settings_db.h"
+EXPORT_SYMBOL(mali_set_user_setting);
+EXPORT_SYMBOL(mali_get_user_setting);
 #if MALI_DVFS_ENABLED
 extern int mali_dvfs_control;
 module_param(mali_dvfs_control, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP| S_IROTH); /* rw-rw-r-- */
