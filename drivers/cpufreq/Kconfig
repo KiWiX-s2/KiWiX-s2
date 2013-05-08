@@ -322,19 +322,14 @@ config CPU_FREQ_GOV_LULZACTIVE
 config CPU_FREQ_GOV_SLP
 	tristate "'slp' cpufreq policy governor"
 
-config SLP_CHECK_CPU_LOAD
-        bool "check load and frequency of cpu"
-	depends on CPU_FREQ_GOV_SLP
-
-config SLP_GOV_DYNAMIC_PARAMS
-        bool "check SLP GOV. Dynamic Params feature"
-	depends on CPU_FREQ_GOV_SLP
-
 config CPU_FREQ_DEFAULT_GOV_INTELLIDEMAND
 	bool "intellidemand"
 	select CPU_FREQ_GOV_INTELLIDEMAND
 	---help---
           Use the CPUFreq governor 'intellidemand' as default.
+
+config CPU_FREQ_GOV_HYPER
+	tristate "'hyper' cpufreq policy governor"
 
 config CPU_FREQ_DVFS_MONITOR
 	bool "dvfs monitor"
