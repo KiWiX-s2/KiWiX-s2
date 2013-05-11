@@ -40,7 +40,7 @@
 static int bMaliDvfsRun = 0;
 
 static _mali_osk_atomic_t bottomlock_status;
-extern int bottom_lock_step;
+static int bottom_lock_step = 0;
 
 typedef struct mali_dvfs_tableTag{
 	unsigned int clock;
@@ -168,8 +168,13 @@ int cpufreq_lock_by_mali(unsigned int freq)
 	if (atomic_read(&mali_cpufreq_lock) == 1)
 		exynos_cpufreq_lock_free(DVFS_LOCK_ID_G3D);
 
-	if (atomic_read(&mali_cpufreq_lock) == 1)
-		exynos_cpufreq_lock_free(DVFS_LOCK_ID_G3D);
+	if (exynos_cpufreq_get_level(freq * 1000, &level)) {
+		printk(KERN_ERR
+			"Mali: failed to get cpufreq level for %dMHz", freq);
+		if (atomic_read(&mali_cpufreq_lock) == 1)
+			atomic_set(&mali_cpufreq_lock, 0);
+		return -EINVAL;
+	}
 
 	if (exynos_cpufreq_lock(DVFS_LOCK_ID_G3D, level)) {
 		printk(KERN_ERR "Mali: failed to cpufreq lock for L%d", level);
