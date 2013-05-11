@@ -513,7 +513,6 @@ static _mali_osk_errcode_t enable_mali_clocks(void)
 {
 	int err;
 	err = clk_enable(mali_clock);
-	mali_restore_vpll_mode();
 	MALI_DEBUG_PRINT(3,("enable_mali_clocks mali_clock %p error %d \n", mali_clock, err));
 
 	// set clock rate
