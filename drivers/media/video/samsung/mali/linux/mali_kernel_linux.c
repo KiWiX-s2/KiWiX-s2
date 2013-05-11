@@ -90,7 +90,7 @@ module_param(mali_gpu_clk, int, S_IRUSR | S_IRGRP | S_IROTH); /* r--r--r-- */
 MODULE_PARM_DESC(mali_gpu_clk, "Mali Current Clock");
 
 extern int mali_gpu_utilization_timeout;
-module_param(mali_gpu_utilization_timeout, int, S_IRUSR | S_IRGRP | S_IROTH); /* r--r--r-- */
+module_param(mali_gpu_utilization_timeout, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP| S_IROTH); /* rw-rw-r-- */
 MODULE_PARM_DESC(mali_gpu_utilization_timeout, "Mali GPU Utilization Timeout");
 
 extern int mali_gpu_vol;
