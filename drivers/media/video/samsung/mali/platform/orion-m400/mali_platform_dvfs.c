@@ -40,7 +40,7 @@
 static int bMaliDvfsRun = 0;
 
 static _mali_osk_atomic_t bottomlock_status;
-static int bottom_lock_step = 0;
+extern int bottom_lock_step;
 
 typedef struct mali_dvfs_tableTag{
 	unsigned int clock;
@@ -403,13 +403,13 @@ int mali_dvfs_is_running(void)
 void mali_dvfs_late_resume(void)
 {
 	// set the init clock as low when resume
-	set_mali_dvfs_status(0,0);
+	set_mali_dvfs_status(0, 0);
 }
 
 
 static void mali_dvfs_work_handler(struct work_struct *w)
 {
-	bMaliDvfsRun=1;
+	bMaliDvfsRun = 1;
 
 	MALI_DEBUG_PRINT(3, ("=== mali_dvfs_work_handler\n"));
 
