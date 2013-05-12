@@ -12,7 +12,7 @@ INITRAMFS_TMP="/tmp/initramfs-source"
 
 if [ ! -f $KERNELDIR/.config ];
 then
-  make siyah_s2_defconfig
+  make kiwix_s2_defconfig
 fi
 
 . $KERNELDIR/.config
