@@ -40,7 +40,7 @@
 static int bMaliDvfsRun = 0;
 
 static _mali_osk_atomic_t bottomlock_status;
-static int bottom_lock_step = 0;
+static int bottom_lock_step;
 
 typedef struct mali_dvfs_tableTag{
 	unsigned int clock;
@@ -117,23 +117,23 @@ mali_dvfs_threshold_table mali_dvfs_threshold[MALI_DVFS_STEPS]={
 
 static unsigned int asv_3d_volt_5_table[ASV_5_LEVEL][MALI_DVFS_STEPS] = {
 	/* L4(108MHz), L3(160MHz), L2(267MHz), L1(330MHz) */
-	{ 975000, 1000000, 1100000, 1150000},  /* S */
-	{ 975000, 1000000, 1100000, 1150000},  /* A */
-	{ 925000,  950000, 1000000, 1100000},  /* B */
-	{ 925000,  950000, 1000000, 1050000},  /* C */
-	{ 925000,  950000,  950000, 1000000},  /* D */
+	{ 950000, 1000000, 1100000, 1150000},  /* S */
+	{ 950000, 1000000, 1100000, 1150000},  /* A */
+	{ 900000,  950000, 1000000, 1100000},  /* B */
+	{ 900000,  950000, 1000000, 1050000},  /* C */
+	{ 900000,  950000,  950000, 1000000},  /* D */
 };
 
 static unsigned int asv_3d_volt_8_table[ASV_8_LEVEL][MALI_DVFS_STEPS] = {
 	/* L4(108MHz), L3(160MHz), L2(267MHz)), L1(330MHz) */
-	{ 975000, 1000000, 1100000, 1150000},  /* SS */
-	{ 975000, 1000000, 1100000, 1150000},  /* A1 */
-	{ 975000, 1000000, 1100000, 1150000},  /* A2 */
-	{ 925000,  950000, 1000000, 1100000},  /* B1 */
-	{ 925000,  950000, 1000000, 1100000},  /* B2 */
-	{ 925000,  950000, 1000000, 1050000},  /* C1 */
-	{ 925000,  950000, 1000000, 1050000},  /* C2 */
-	{ 925000,  950000,  950000, 1000000},  /* D1 */
+	{ 950000, 1000000, 1100000, 1150000},  /* SS */
+	{ 950000, 1000000, 1100000, 1150000},  /* A1 */
+	{ 950000, 1000000, 1100000, 1150000},  /* A2 */
+	{ 900000,  950000, 1000000, 1100000},  /* B1 */
+	{ 900000,  950000, 1000000, 1100000},  /* B2 */
+	{ 900000,  950000, 1000000, 1050000},  /* C1 */
+	{ 900000,  950000, 1000000, 1050000},  /* C2 */
+	{ 900000,  950000,  950000, 1000000},  /* D1 */
 };
 #endif
 
@@ -168,13 +168,8 @@ int cpufreq_lock_by_mali(unsigned int freq)
 	if (atomic_read(&mali_cpufreq_lock) == 1)
 		exynos_cpufreq_lock_free(DVFS_LOCK_ID_G3D);
 
-	if (exynos_cpufreq_get_level(freq * 1000, &level)) {
-		printk(KERN_ERR
-			"Mali: failed to get cpufreq level for %dMHz", freq);
-		if (atomic_read(&mali_cpufreq_lock) == 1)
-			atomic_set(&mali_cpufreq_lock, 0);
-		return -EINVAL;
-	}
+	if (atomic_read(&mali_cpufreq_lock) == 1)
+		exynos_cpufreq_lock_free(DVFS_LOCK_ID_G3D);
 
 	if (exynos_cpufreq_lock(DVFS_LOCK_ID_G3D, level)) {
 		printk(KERN_ERR "Mali: failed to cpufreq lock for L%d", level);
@@ -367,8 +362,20 @@ static mali_bool mali_dvfs_status(u32 utilization)
 	unsigned int curStatus = 0;
 	mali_bool boostup = MALI_FALSE;
 	static int stay_count = 0;
+#ifdef EXYNOS4_ASV_ENABLED
+	static mali_bool asv_applied = MALI_FALSE;
+#endif
 
 	MALI_DEBUG_PRINT(1, ("> mali_dvfs_status: %d \n",utilization));
+#ifdef EXYNOS4_ASV_ENABLED
+	if (asv_applied == MALI_FALSE) {
+		mali_dvfs_table_update();
+		change_mali_dvfs_status(0,0);
+		asv_applied = MALI_TRUE;
+
+		return MALI_TRUE;
+	}
+#endif
 
 	/*decide next step*/
 	curStatus = get_mali_dvfs_status();
@@ -408,13 +415,13 @@ int mali_dvfs_is_running(void)
 void mali_dvfs_late_resume(void)
 {
 	// set the init clock as low when resume
-	set_mali_dvfs_status(0, 0);
+	set_mali_dvfs_status(0,0);
 }
 
 
 static void mali_dvfs_work_handler(struct work_struct *w)
 {
-	bMaliDvfsRun = 1;
+	bMaliDvfsRun=1;
 
 	MALI_DEBUG_PRINT(3, ("=== mali_dvfs_work_handler\n"));
 
@@ -434,8 +441,6 @@ mali_bool init_mali_dvfs_status(int step)
 
 	_mali_osk_atomic_init(&bottomlock_status, 0);
 
-	mali_dvfs_table_update();
-
 	/*add a error handling here*/
 	set_mali_dvfs_current_step(step);
 
@@ -444,11 +449,11 @@ mali_bool init_mali_dvfs_status(int step)
 
 void deinit_mali_dvfs_status(void)
 {
+	if (mali_dvfs_wq)
+		destroy_workqueue(mali_dvfs_wq);
 
 	_mali_osk_atomic_term(&bottomlock_status);
 
-	if (mali_dvfs_wq)
-		destroy_workqueue(mali_dvfs_wq);
 	mali_dvfs_wq = NULL;
 }
 
