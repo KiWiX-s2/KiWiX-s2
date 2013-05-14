@@ -347,9 +347,15 @@ CHECK		= sparse
 
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
-OPTIMIZATION_FLAGS = -march=armv7-a -mtune=cortex-a9 -mfpu=neon \
-                     -ffast-math -fsingle-precision-constant \
-                     -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr
+OPTIMIZATION_FLAGS = -O2 \
+                     -march=armv7-a \
+                     -mtune=cortex-a9 \
+                     -mfpu=neon \
+                     -ffast-math \
+                     -fsingle-precision-constant \
+                     -fgcse-lm \
+                     -fgcse-sm -fsched-spec-load \
+                     -fforce-addr 
 
 CFLAGS_MODULE   = $(OPTIMIZATION_FLAGS)
 AFLAGS_MODULE   = $(OPTIMIZATION_FLAGS)
@@ -564,9 +570,9 @@ endif # $(dot-config)
 all: vmlinux
 
 ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
-KBUILD_CFLAGS	+= -Os
+KBUILD_CFLAGS  += -O2
 else
-KBUILD_CFLAGS	+= -O2
+KBUILD_CFLAGS  += -O2
 endif
 
 ifdef CONFIG_CC_CHECK_WARNING_STRICTLY
